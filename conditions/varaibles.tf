@@ -1,15 +1,20 @@
+variable "environment" {
+    type        = string
+    default     = "dev"
+}
+
 variable "ami_id" {
     type        = string
     default     = "ami-0220d79f3f480ecf5"
     description = "RHEL 9 Image"
 }
 
-variable "aws_instance_type" {
+/* variable "aws_instance_type" {
     type        = string
     default = "t3.micro"
     description = "instance"
 
-}
+} */
 
 variable "ec2_tags" {
     type = map

@@ -1,6 +1,8 @@
 resource "aws_instance" "example" {
-  ami           = var.ami_id
-  instance_type = var.aws_instance_type
+  ami           = var.ami_id  
+  #if the condition is true select t3.micro value if false t3.small
+  instance_type = var.environment == "dev" ? "t3.micro" : "t3.small"
+
   vpc_security_group_ids = [aws_security_group.create_SG.id]
 
   tags = var.ec2_tags

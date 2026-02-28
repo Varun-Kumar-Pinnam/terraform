@@ -1,16 +1,22 @@
 resource "aws_instance" "example" {
+  count = 5
   ami           = var.ami_id
   instance_type = var.aws_instance_type
   vpc_security_group_ids = [aws_security_group.create_SG.id]
 
-  tags = var.ec2_tags
+  tags = {
+    Name = var.instances[count.index]
+    Project = "Roboshop"
+  }
 }
 
 resource "aws_security_group" "create_SG" {
   name        = var.sg_name
   description = "Allow traffic"
  
-  tags = var.sg_tags_name
+  tags = {
+    Name = var.sg_tags_name
+  }
 
     egress {
     from_port        = var.sg_from_port
