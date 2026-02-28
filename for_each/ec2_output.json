@@ -1,5 +1,5 @@
  {
-  "frontend" = {
+  "frontend"  {
     "ami" = "ami-0220d79f3f480ecf5"
     "arn" = "arn:aws:ec2:us-east-1:697076424099:instance/i-0aeb3192d887b2100"
     "associate_public_ip_address" = true
