@@ -24,7 +24,7 @@ variable "instance" {
 #list , conver list to set
 variable "instance" {
     type = list 
-    default = ["mongodb","user"]
+    default = ["mongodb","frontend"]
     
 }
 
