@@ -10,7 +10,3 @@ filter {
 
 }
 
-data "aws_instance" "foo" {
-  instance_id = "i-08ee8a743388aff66"
-  
-}
