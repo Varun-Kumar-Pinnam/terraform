@@ -7,7 +7,6 @@ resource "aws_instance" "example" {
     Name = "terraform"
     Project = "Roboshop"
   }
-
 }
 
 resource "aws_security_group" "create_SG" {
