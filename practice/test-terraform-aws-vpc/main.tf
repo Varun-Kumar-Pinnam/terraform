@@ -2,7 +2,7 @@ resource "aws_vpc" "main" {
   cidr_block       = var.vpc_cidrs
   instance_tenancy = "default"
   enable_dns_hostnames = true
-  tags = local.common_tags
+  tags = local.vpc_final_tags
 }
 
 resource "aws_internet_gateway" "gw" {
@@ -18,7 +18,117 @@ resource "aws_subnet" "public" {
   availability_zone = local.avz[count.index]
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "Main"
-  }
+tags = merge(
+      local.common_tags,
+    {
+      Name = "${var.project}-${var.environment}-public-${local.avz[count.index]}"
+    },
+    var.public_subnet_tags
+ )
 }
+
+resource "aws_subnet" "private" {
+  count = length(var.private_subnet_cidrs)
+  vpc_id     = aws_vpc.main.id
+  cidr_block = var.private_subnet_cidrs[count.index]
+  availability_zone = local.avz[count.index]
+  
+
+tags = merge(
+      local.common_tags,
+    {
+      Name = "${var.project}-${var.environment}-private-${local.avz[count.index]}"
+    },
+    var.public_subnet_tags
+ )
+}
+
+resource "aws_subnet" "database" {
+  count = length(var.database_subnet_cidrs)
+  vpc_id     = aws_vpc.main.id
+  cidr_block = var.database_subnet_cidrs[count.index]
+  availability_zone = local.avz[count.index]
+  
+
+tags = merge(
+      local.common_tags,
+    {
+      Name = "${var.project}-${var.environment}-database-${local.avz[count.index]}"
+    },
+    var.public_subnet_tags
+ )
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  tags = local.public_route_table_tags
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+  tags = local.private_route_table_tags
+}
+
+resource "aws_route_table" "database" {
+  vpc_id = aws_vpc.main.id
+  tags = local.database_route_table_tags
+}
+
+resource "aws_route" "public" {
+  route_table_id            = aws_route_table.public.id
+  destination_cidr_block    = "0.0.0.0/16"
+  gateway_id = aws_internet_gateway.gw.id
+
+}
+
+resource "aws_eip" "nat" {
+    domain   = "vpc"
+  tags = local.aws_eip_final_tags
+}
+
+resource "aws_nat_gateway" "natgw" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
+  
+
+  tags = local.aws_natgw_final_tags
+
+  # To ensure proper ordering, it is recommended to add an explicit dependency
+  # on the Internet Gateway for the VPC.
+  depends_on = [aws_internet_gateway.gw]
+}
+
+resource "aws_route" "private" {
+  route_table_id            = aws_route_table.private.id
+  destination_cidr_block    = "0.0.0.0/16"
+  nat_gateway_id = aws_nat_gateway.natgw.id
+
+}
+
+resource "aws_route" "database" {
+  route_table_id            = aws_route_table.database.id
+  destination_cidr_block    = "0.0.0.0/16"
+  nat_gateway_id = aws_nat_gateway.natgw.id
+
+}
+
+resource "aws_route_table_association" "public" {
+  count = length(var.public_subnet_cidrs)
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "private" {
+  count = length(var.private_subnet_cidrs)
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
+}
+
+
+resource "aws_route_table_association" "database" {
+  count = length(var.database_subnet_cidrs)
+  subnet_id      = aws_subnet.database[count.index].id
+  route_table_id = aws_route_table.database.id
+}
+
+

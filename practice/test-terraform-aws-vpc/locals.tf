@@ -21,7 +21,57 @@ locals {
     var.gw_tags
   )
   avz = slice(data.aws_availability_zones.available.names, 0 , 2)
+ 
 
+public_route_table_tags = merge(
+    local.common_tags,
+    {
+        Name="${var.project}-${var.environment}-public"
+    },
+    var.route_table_public_tags
+)
+
+private_route_table_tags = merge(
+    local.common_tags,
+    {
+        Name="${var.project}-${var.environment}-private"
+    },
+    var.route_table_private_tags
+)
+
+database_route_table_tags = merge(
+    local.common_tags,
+    {
+        Name="${var.project}-${var.environment}-database"
+    },
+    var.route_table_database_tags
+)
+
+
+aws_eip_final_tags = merge(
+    local.common_tags,
+    {
+        Name = "${var.project}-${var.environment}-eip"
+    },
+    var.eip_tags
+)
+
+
+aws_natgw_final_tags = merge(
+    local.common_tags,
+    {
+        Name = "${var.project}-${var.environment}-natgatway"
+    },
+    var.natgw_tags
+)
+
+aws_peering_final_tags = merge(
+    local.common_tags,
+    {
+        Name = "${var.project}-${var.environment}"
+    },
+    var.peering_tags
+)
 
 }
 

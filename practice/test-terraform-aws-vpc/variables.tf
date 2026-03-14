@@ -47,3 +47,46 @@ variable "database_subnet_tags" {
   type = map
   default = {}
 }
+
+
+
+variable "route_table_public_tags" {
+  type = map
+  default = {}  
+}
+
+variable "route_table_private_tags" {
+  type = map
+  default = {}  
+}
+
+variable "route_table_database_tags" {
+  type = map
+  default = {}  
+}
+
+variable "aws_route_public_tags" {
+  type = map
+  default = {}  
+}
+
+variable "eip_tags" {
+    type = map 
+    default = {}  
+}
+
+variable "natgw_tags" {
+    type = map 
+    default = {}  
+}
+
+variable "is_peering_required" {
+  type = bool
+  default = false  
+}
+
+variable "peering_tags" {
+  type = map
+  default = {}
+  
+}
